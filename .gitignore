@@ -1,0 +1,8 @@
+__pycache__
+*.schem
+*.png
+*.jpg
+*.jpeg
+*.ply
+*.obj
+*.stl
