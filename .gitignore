@@ -1,4 +1,7 @@
 __pycache__
+textures
+*.json
+!palette/*.json
 *.schem
 *.png
 *.jpg

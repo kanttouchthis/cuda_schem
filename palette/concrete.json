@@ -1,0 +1,82 @@
+{
+    "minecraft:black_concrete": [
+        8,
+        10,
+        15
+    ],
+    "minecraft:blue_concrete": [
+        44,
+        46,
+        143
+    ],
+    "minecraft:brown_concrete": [
+        96,
+        59,
+        31
+    ],
+    "minecraft:cyan_concrete": [
+        21,
+        119,
+        136
+    ],
+    "minecraft:gray_concrete": [
+        54,
+        57,
+        61
+    ],
+    "minecraft:green_concrete": [
+        73,
+        91,
+        36
+    ],
+    "minecraft:light_blue_concrete": [
+        35,
+        137,
+        198
+    ],
+    "minecraft:light_gray_concrete": [
+        125,
+        125,
+        115
+    ],
+    "minecraft:lime_concrete": [
+        94,
+        168,
+        24
+    ],
+    "minecraft:magenta_concrete": [
+        169,
+        48,
+        159
+    ],
+    "minecraft:orange_concrete": [
+        224,
+        97,
+        0
+    ],
+    "minecraft:pink_concrete": [
+        213,
+        101,
+        142
+    ],
+    "minecraft:purple_concrete": [
+        100,
+        31,
+        156
+    ],
+    "minecraft:red_concrete": [
+        142,
+        32,
+        32
+    ],
+    "minecraft:white_concrete": [
+        207,
+        213,
+        214
+    ],
+    "minecraft:yellow_concrete": [
+        240,
+        175,
+        21
+    ]
+}

@@ -1,0 +1,82 @@
+{
+    "minecraft:black_wool": [
+        20,
+        21,
+        25
+    ],
+    "minecraft:blue_wool": [
+        53,
+        57,
+        157
+    ],
+    "minecraft:brown_wool": [
+        114,
+        71,
+        40
+    ],
+    "minecraft:cyan_wool": [
+        21,
+        137,
+        145
+    ],
+    "minecraft:gray_wool": [
+        62,
+        68,
+        71
+    ],
+    "minecraft:green_wool": [
+        84,
+        109,
+        27
+    ],
+    "minecraft:light_blue_wool": [
+        58,
+        175,
+        217
+    ],
+    "minecraft:light_gray_wool": [
+        142,
+        142,
+        134
+    ],
+    "minecraft:lime_wool": [
+        112,
+        185,
+        25
+    ],
+    "minecraft:magenta_wool": [
+        189,
+        68,
+        179
+    ],
+    "minecraft:orange_wool": [
+        240,
+        118,
+        19
+    ],
+    "minecraft:pink_wool": [
+        237,
+        141,
+        172
+    ],
+    "minecraft:purple_wool": [
+        121,
+        42,
+        172
+    ],
+    "minecraft:red_wool": [
+        160,
+        39,
+        34
+    ],
+    "minecraft:white_wool": [
+        233,
+        236,
+        236
+    ],
+    "minecraft:yellow_wool": [
+        248,
+        197,
+        39
+    ]
+}

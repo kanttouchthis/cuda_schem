@@ -199,7 +199,6 @@ def load_mesh_and_voxelize_color(
     grid_dim = np.ceil((max_bound - min_bound) / voxel_size).astype(np.int32)
 
     # Allocate voxel grid
-    t0 = perf_counter_ns()
     voxels = np.zeros(tuple(grid_dim), dtype=np.int64)
 
     # Transfer to GPU
@@ -220,15 +219,12 @@ def load_mesh_and_voxelize_color(
     voxels = d_voxels.copy_to_host()
     blocks_dict = {}
     palette_keys = list(palette.keys())
-    for v in np.argwhere(voxels):
-        xyz = tuple(v)
-        idx = voxels[*v] - 1
-        color = qcolors_idx[idx]
-        block = palette_keys[color]
-        blocks_dict[xyz] = block
+    nonzero_coords = np.argwhere(voxels)
+    voxel_values = voxels[tuple(nonzero_coords.T)] - 1
+    colors = qcolors_idx[voxel_values]
+    blocks = [palette_keys[color] for color in colors]
+    blocks_dict = dict(zip(map(tuple, nonzero_coords), blocks))
 
-    t1 = perf_counter_ns()
-    print(f"{int((t1-t0)/1000000)}ms")
     return blocks_dict
 
 
@@ -244,7 +240,6 @@ if __name__ == "__main__":
     parser.add_argument("--texture", "-t", type=str, default=None)
     parser.add_argument("--palette", "-p", default=None)
     parser.add_argument("--N_voxels", "-n", type=int, default=128)
-    parser.add_argument("--fast", action="store_true")
     args = parser.parse_args()
 
     if args.palette is not None:
@@ -252,7 +247,13 @@ if __name__ == "__main__":
     else:
         palette = {"minecraft:stone": (0, 0, 0)}
 
+    t0 = perf_counter_ns()
     voxels = load_mesh_and_voxelize_color(
-        args.model, args.texture, palette, args.N_voxels, args.fast
+        args.model, args.texture, palette, args.N_voxels
     )
+    t1 = perf_counter_ns()
+    print(f"Voxelization: {int((t1-t0)/1000000)}ms")
+    t0 = perf_counter_ns()
     write_schem(voxels, args.output)
+    t1 = perf_counter_ns()
+    print(f"Schem export: {int((t1-t0)/1000000)}ms")

@@ -1,0 +1,162 @@
+{
+    "minecraft:black_glazed_terracotta": [
+        67,
+        30,
+        32
+    ],
+    "minecraft:black_terracotta": [
+        37,
+        22,
+        16
+    ],
+    "minecraft:blue_glazed_terracotta": [
+        47,
+        64,
+        139
+    ],
+    "minecraft:blue_terracotta": [
+        74,
+        59,
+        91
+    ],
+    "minecraft:brown_glazed_terracotta": [
+        119,
+        106,
+        85
+    ],
+    "minecraft:brown_terracotta": [
+        77,
+        51,
+        35
+    ],
+    "minecraft:cyan_glazed_terracotta": [
+        52,
+        118,
+        125
+    ],
+    "minecraft:cyan_terracotta": [
+        86,
+        91,
+        91
+    ],
+    "minecraft:gray_glazed_terracotta": [
+        83,
+        90,
+        93
+    ],
+    "minecraft:gray_terracotta": [
+        57,
+        42,
+        35
+    ],
+    "minecraft:green_glazed_terracotta": [
+        117,
+        142,
+        67
+    ],
+    "minecraft:green_terracotta": [
+        76,
+        83,
+        42
+    ],
+    "minecraft:light_blue_glazed_terracotta": [
+        94,
+        164,
+        208
+    ],
+    "minecraft:light_blue_terracotta": [
+        113,
+        108,
+        137
+    ],
+    "minecraft:light_gray_glazed_terracotta": [
+        144,
+        166,
+        167
+    ],
+    "minecraft:light_gray_terracotta": [
+        135,
+        106,
+        97
+    ],
+    "minecraft:lime_glazed_terracotta": [
+        162,
+        197,
+        55
+    ],
+    "minecraft:lime_terracotta": [
+        103,
+        117,
+        52
+    ],
+    "minecraft:magenta_glazed_terracotta": [
+        208,
+        100,
+        191
+    ],
+    "minecraft:magenta_terracotta": [
+        149,
+        88,
+        108
+    ],
+    "minecraft:orange_glazed_terracotta": [
+        154,
+        147,
+        91
+    ],
+    "minecraft:orange_terracotta": [
+        161,
+        83,
+        37
+    ],
+    "minecraft:pink_glazed_terracotta": [
+        235,
+        154,
+        181
+    ],
+    "minecraft:pink_terracotta": [
+        161,
+        78,
+        78
+    ],
+    "minecraft:purple_glazed_terracotta": [
+        109,
+        47,
+        152
+    ],
+    "minecraft:purple_terracotta": [
+        118,
+        70,
+        86
+    ],
+    "minecraft:red_glazed_terracotta": [
+        181,
+        59,
+        53
+    ],
+    "minecraft:red_terracotta": [
+        143,
+        61,
+        46
+    ],
+    "minecraft:white_glazed_terracotta": [
+        188,
+        212,
+        202
+    ],
+    "minecraft:white_terracotta": [
+        209,
+        178,
+        161
+    ],
+    "minecraft:yellow_glazed_terracotta": [
+        234,
+        192,
+        88
+    ],
+    "minecraft:yellow_terracotta": [
+        186,
+        133,
+        35
+    ]
+}
