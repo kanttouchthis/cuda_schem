@@ -1,0 +1,6 @@
+nbtlib
+numba
+numba-cuda
+numpy
+Pillow
+trimesh
