@@ -11,6 +11,7 @@ from trimesh.voxel import VoxelGrid
 
 from schem import write_schem
 
+FAST = False
 
 @cuda.jit(device=True)
 def triangle_box_intersect_sat(v0, v1, v2, box_center, box_half_size):
@@ -57,6 +58,10 @@ def triangle_box_intersect_sat(v0, v1, v2, box_center, box_half_size):
     )
     if abs(d) > r:
         return False
+
+    # FAST: skip axis test
+    if FAST:
+        return True
 
     # 3. Test 9 cross product axes (edge × AABB axis)
     def axis_test(edge, a, b, fa, fb, v0, v1, v2, box_half_size):
@@ -143,7 +148,7 @@ def voxelize_kernel(vertices, faces, voxels, voxel_size, grid_origin, grid_dim):
                 voxel_center[1] = grid_origin[1] + (y + 0.5) * voxel_size
                 voxel_center[2] = grid_origin[2] + (z + 0.5) * voxel_size
                 if triangle_box_intersect_sat(v0, v1, v2, voxel_center, box_half_size):
-                    cuda.atomic.max(voxels, (x, y, z), tri_idx + 1)
+                    voxels[x, y, z] = tri_idx + 1
 
 
 def get_colors(mesh, texture_path):
@@ -199,12 +204,11 @@ def load_mesh_and_voxelize_color(
     grid_dim = np.ceil((max_bound - min_bound) / voxel_size).astype(np.int32)
 
     # Allocate voxel grid
-    voxels = np.zeros(tuple(grid_dim), dtype=np.int64)
+    d_voxels = cuda.device_array(tuple(grid_dim), dtype=np.int64)
 
     # Transfer to GPU
     d_vertices = cuda.to_device(vertices)
     d_faces = cuda.to_device(faces)
-    d_voxels = cuda.to_device(voxels)
     d_min_bound = cuda.to_device(min_bound.astype(np.float32))
     d_grid_dim = cuda.to_device(grid_dim)
 
@@ -240,7 +244,9 @@ if __name__ == "__main__":
     parser.add_argument("--texture", "-t", type=str, default=None, help="Path to texture")
     parser.add_argument("--palette", "-p", default=None, help="Path to .json palette")
     parser.add_argument("--N_voxels", "-n", type=int, default=128, help="Maximum number of voxels in each direction (XYZ)")
+    parser.add_argument("--fast", action="store_true", help="Enable faster, less precise voxelization")
     args = parser.parse_args()
+    FAST = args.fast
 
     if args.palette is not None:
         palette = json.load(open(args.palette, "r"))
