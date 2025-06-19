@@ -92,7 +92,7 @@ def load_mesh_and_voxelize_color(
 ):
     palette_rgb = list(palette.values())
 
-    mesh = trimesh.load(model_path, process=True)
+    mesh = trimesh.load(model_path, process=True, force="mesh")
     vertices = np.array(mesh.vertices, dtype=np.float32)
     faces = np.array(mesh.faces, dtype=np.int32)
     if texture_path is not None:
