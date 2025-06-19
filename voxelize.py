@@ -12,6 +12,89 @@ from trimesh.voxel import VoxelGrid
 from schem import write_schem
 
 
+@cuda.jit(device=True)
+def triangle_box_intersect_sat(v0, v1, v2, box_center, box_half_size):
+    # Translate triangle to box's local space
+    tv0 = cuda.local.array(3, dtype=numba.float32)
+    tv1 = cuda.local.array(3, dtype=numba.float32)
+    tv2 = cuda.local.array(3, dtype=numba.float32)
+
+    for i in range(3):
+        tv0[i] = v0[i] - box_center[i]
+        tv1[i] = v1[i] - box_center[i]
+        tv2[i] = v2[i] - box_center[i]
+
+    # Triangle edges
+    e0 = cuda.local.array(3, dtype=numba.float32)
+    e1 = cuda.local.array(3, dtype=numba.float32)
+    e2 = cuda.local.array(3, dtype=numba.float32)
+    for i in range(3):
+        e0[i] = tv1[i] - tv0[i]
+        e1[i] = tv2[i] - tv1[i]
+        e2[i] = tv0[i] - tv2[i]
+
+    # Helper
+    def find_min_max(x0, x1, x2):
+        return min(x0, x1, x2), max(x0, x1, x2)
+
+    # 1. Test AABB face normals (X, Y, Z)
+    for i in range(3):
+        min_v, max_v = find_min_max(tv0[i], tv1[i], tv2[i])
+        if min_v > box_half_size[i] or max_v < -box_half_size[i]:
+            return False
+
+    # 2. Test triangle normal axis
+    normal = cuda.local.array(3, dtype=numba.float32)
+    normal[0] = e0[1] * e1[2] - e0[2] * e1[1]
+    normal[1] = e0[2] * e1[0] - e0[0] * e1[2]
+    normal[2] = e0[0] * e1[1] - e0[1] * e1[0]
+
+    d = normal[0] * tv0[0] + normal[1] * tv0[1] + normal[2] * tv0[2]
+    r = (
+        box_half_size[0] * abs(normal[0])
+        + box_half_size[1] * abs(normal[1])
+        + box_half_size[2] * abs(normal[2])
+    )
+    if abs(d) > r:
+        return False
+
+    # 3. Test 9 cross product axes (edge × AABB axis)
+    def axis_test(edge, a, b, fa, fb, v0, v1, v2, box_half_size):
+        p0 = edge[a] * v0[b] - edge[b] * v0[a]
+        p1 = edge[a] * v1[b] - edge[b] * v1[a]
+        p2 = edge[a] * v2[b] - edge[b] * v2[a]
+        min_p = min(p0, p1, p2)
+        max_p = max(p0, p1, p2)
+        rad = fa * box_half_size[a] + fb * box_half_size[b]
+        return not (min_p > rad or max_p < -rad)
+
+    fa0, fa1, fa2 = abs(e0[0]), abs(e0[1]), abs(e0[2])
+    if not axis_test(e0, 1, 2, fa1, fa2, tv0, tv1, tv2, box_half_size):
+        return False
+    if not axis_test(e0, 0, 2, fa0, fa2, tv0, tv1, tv2, box_half_size):
+        return False
+    if not axis_test(e0, 0, 1, fa0, fa1, tv0, tv1, tv2, box_half_size):
+        return False
+
+    fb0, fb1, fb2 = abs(e1[0]), abs(e1[1]), abs(e1[2])
+    if not axis_test(e1, 1, 2, fb1, fb2, tv0, tv1, tv2, box_half_size):
+        return False
+    if not axis_test(e1, 0, 2, fb0, fb2, tv0, tv1, tv2, box_half_size):
+        return False
+    if not axis_test(e1, 0, 1, fb0, fb1, tv0, tv1, tv2, box_half_size):
+        return False
+
+    fc0, fc1, fc2 = abs(e2[0]), abs(e2[1]), abs(e2[2])
+    if not axis_test(e2, 1, 2, fc1, fc2, tv0, tv1, tv2, box_half_size):
+        return False
+    if not axis_test(e2, 0, 2, fc0, fc2, tv0, tv1, tv2, box_half_size):
+        return False
+    if not axis_test(e2, 0, 1, fc0, fc1, tv0, tv1, tv2, box_half_size):
+        return False
+
+    return True
+
+
 @cuda.jit
 def voxelize_kernel(vertices, faces, voxels, voxel_size, grid_origin, grid_dim):
     tri_idx = cuda.grid(1)
@@ -29,6 +112,12 @@ def voxelize_kernel(vertices, faces, voxels, voxel_size, grid_origin, grid_dim):
     # Compute triangle AABB
     min_corner = cuda.local.array(3, dtype=numba.float32)
     max_corner = cuda.local.array(3, dtype=numba.float32)
+
+    half = voxel_size * 0.5
+    box_half_size = cuda.local.array(3, dtype=numba.float32)
+    box_half_size[0] = half
+    box_half_size[1] = half
+    box_half_size[2] = half
 
     for i in range(3):
         min_corner[i] = min(v0[i], v1[i], v2[i])
@@ -53,7 +142,8 @@ def voxelize_kernel(vertices, faces, voxels, voxel_size, grid_origin, grid_dim):
                 voxel_center[0] = grid_origin[0] + (x + 0.5) * voxel_size
                 voxel_center[1] = grid_origin[1] + (y + 0.5) * voxel_size
                 voxel_center[2] = grid_origin[2] + (z + 0.5) * voxel_size
-                voxels[x, y, z] = tri_idx + 1
+                if triangle_box_intersect_sat(v0, v1, v2, voxel_center, box_half_size):
+                    cuda.atomic.max(voxels, (x, y, z), tri_idx + 1)
 
 
 def get_colors(mesh, texture_path):
@@ -154,6 +244,7 @@ if __name__ == "__main__":
     parser.add_argument("--texture", "-t", type=str, default=None)
     parser.add_argument("--palette", "-p", default=None)
     parser.add_argument("--N_voxels", "-n", type=int, default=128)
+    parser.add_argument("--fast", action="store_true")
     args = parser.parse_args()
 
     if args.palette is not None:
@@ -162,6 +253,6 @@ if __name__ == "__main__":
         palette = {"minecraft:stone": (0, 0, 0)}
 
     voxels = load_mesh_and_voxelize_color(
-        args.model, args.texture, palette, args.N_voxels
+        args.model, args.texture, palette, args.N_voxels, args.fast
     )
     write_schem(voxels, args.output)
