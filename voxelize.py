@@ -34,13 +34,9 @@ def triangle_box_intersect_sat(v0, v1, v2, box_center, box_half_size):
         e1[i] = tv2[i] - tv1[i]
         e2[i] = tv0[i] - tv2[i]
 
-    # Helper
-    def find_min_max(x0, x1, x2):
-        return min(x0, x1, x2), max(x0, x1, x2)
-
     # 1. Test AABB face normals (X, Y, Z)
     for i in range(3):
-        min_v, max_v = find_min_max(tv0[i], tv1[i], tv2[i])
+        min_v, max_v = min(tv0[i], tv1[i], tv2[i]), max(tv0[i], tv1[i], tv2[i])
         if min_v > box_half_size[i] or max_v < -box_half_size[i]:
             return False
 
