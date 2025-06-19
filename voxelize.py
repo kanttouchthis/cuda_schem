@@ -235,11 +235,11 @@ def visualize_voxels_trimesh(voxels):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("model", type=str)
-    parser.add_argument("output", type=str)
-    parser.add_argument("--texture", "-t", type=str, default=None)
-    parser.add_argument("--palette", "-p", default=None)
-    parser.add_argument("--N_voxels", "-n", type=int, default=128)
+    parser.add_argument("model", type=str, help="Path to model (ply, obj, stl, etc.)")
+    parser.add_argument("output", type=str, help="Path to .schem output")
+    parser.add_argument("--texture", "-t", type=str, default=None, help="Path to texture")
+    parser.add_argument("--palette", "-p", default=None, help="Path to .json palette")
+    parser.add_argument("--N_voxels", "-n", type=int, default=128, help="Maximum number of voxels in each direction (XYZ)")
     args = parser.parse_args()
 
     if args.palette is not None:

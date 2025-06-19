@@ -3,9 +3,6 @@ from nbtlib import tag
 
 
 def write_schem(blocks_dict:dict, filename, data_version=4325):
-    """
-    Write to modern .schem format (WorldEdit post-1.13)
-    """
     xs = [x for x, y, z in blocks_dict]
     ys = [y for x, y, z in blocks_dict]
     zs = [z for x, y, z in blocks_dict]
@@ -48,4 +45,3 @@ def write_schem(blocks_dict:dict, filename, data_version=4325):
 
     nbt_file = nbtlib.File(nbt_data, filename=filename, gzipped=True)
     nbt_file.save()
-    print(f"Saved:     {filename}")
