@@ -9,3 +9,4 @@ textures
 *.ply
 *.obj
 *.stl
+*.nbt

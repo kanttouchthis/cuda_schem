@@ -9,7 +9,7 @@ from numba import cuda
 from PIL import Image
 from trimesh.voxel import VoxelGrid
 
-from schem import write_schem
+from schem import write_schem, write_structure
 
 FAST = False
 
@@ -236,7 +236,7 @@ def visualize_voxels_trimesh(voxels):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("model", type=str, help="Path to model (ply, obj, stl, etc.)")
-    parser.add_argument("output", type=str, help="Path to .schem output")
+    parser.add_argument("output", type=str, help="Path to the output file. Use the file extension '.schem' (WorldEdit) or '.nbt' (Structure Block)")
     parser.add_argument("--texture", "-t", type=str, default=None, help="Path to texture")
     parser.add_argument("--palette", "-p", default=None, help="Path to .json palette")
     parser.add_argument("--N_voxels", "-n", type=int, default=128, help="Maximum number of voxels in each direction (XYZ)")
@@ -256,6 +256,9 @@ if __name__ == "__main__":
     t1 = perf_counter_ns()
     print(f"Voxelization: {int((t1-t0)/1000000)}ms")
     t0 = perf_counter_ns()
-    write_schem(voxels, args.output)
+    if ".schem" in args.output:
+        write_schem(voxels, args.output)
+    elif ".nbt" in args.output:
+        write_structure(voxels, args.output)
     t1 = perf_counter_ns()
     print(f"Schem export: {int((t1-t0)/1000000)}ms")
