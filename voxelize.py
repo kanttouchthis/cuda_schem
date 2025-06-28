@@ -2,14 +2,13 @@ import argparse
 import json
 from time import perf_counter_ns
 
+import nbtexport
 import numba
 import numpy as np
 import trimesh
 from numba import cuda
 from PIL import Image
 from trimesh.voxel import VoxelGrid
-
-from schem import write_schem, write_structure
 
 FAST = False
 
@@ -256,9 +255,15 @@ if __name__ == "__main__":
     t1 = perf_counter_ns()
     print(f"Voxelization: {int((t1-t0)/1000000)}ms")
     t0 = perf_counter_ns()
-    if ".schem" in args.output:
-        write_schem(voxels, args.output)
-    elif ".nbt" in args.output:
-        write_structure(voxels, args.output)
+    if args.output.endswith(".schem"):
+        mode = "schem"
+    elif args.output.endswith(".nbt"):
+        mode = "structure"
+    else:
+        print(f"Unknown filetype: {args.output}")
+        exit(1)
+    
+    nbtexport.export(voxels, args.output, mode)
+
     t1 = perf_counter_ns()
-    print(f"Schem export: {int((t1-t0)/1000000)}ms")
+    print(f"{mode} export: {int((t1-t0)/1000000)}ms")

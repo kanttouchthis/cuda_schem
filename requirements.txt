@@ -4,3 +4,4 @@ numba-cuda
 numpy
 Pillow
 trimesh
+git+https://github.com/kanttouchthis/nbtexport
